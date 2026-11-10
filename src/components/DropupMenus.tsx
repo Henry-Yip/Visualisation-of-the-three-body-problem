@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, ChevronUp, Circle } from "lucide-react";
+import { FIXED_CENTRE_ORBITS } from "../utils/fixedCentres";
 
 // Orbit options
 const orbitOptions = [
@@ -19,6 +20,11 @@ const orbitOptions = [
   "Yin-Yang I",
   "Yin-Yang II",
   "Yin-Yang III",
+];
+
+const orbitGroups = [
+  { title: "Three bodies", options: orbitOptions },
+  { title: "Two fixed centres", options: Object.keys(FIXED_CENTRE_ORBITS) },
 ];
 
 // Integrator options
@@ -64,9 +70,16 @@ function DropupMenus({ onIntegratorChange, onOrbitChange }: DropupMenusProps) {
           </button>
           {orbitMenuOpen && (
             <ul className="absolute bottom-full mb-2 w-36 supports-backdrop-blur:bg-white/90 backdrop-blur-xl text-zinc-300 rounded-md overflow-hidden max-h-60 overflow-y-auto">
-              {orbitOptions.map((option, index) => (
+              {orbitGroups.map((group) => [
                 <li
-                  key={index}
+                  key={group.title}
+                  className="px-4 pt-3 pb-1 text-xs uppercase tracking-wide text-zinc-500"
+                >
+                  {group.title}
+                </li>,
+                ...group.options.map((option) => (
+                <li
+                  key={option}
                   className="px-4 py-2 text-white hover:bg-gray-900 cursor-pointer flex items-center justify-between"
                   onClick={() => {
                     console.log(`Selected Orbit: ${option}`);
@@ -80,7 +93,8 @@ function DropupMenus({ onIntegratorChange, onOrbitChange }: DropupMenusProps) {
                     <Check className="w-4 h-4 text-green-500" />
                   )}
                 </li>
-              ))}
+                )),
+              ])}
             </ul>
           )}
         </div>

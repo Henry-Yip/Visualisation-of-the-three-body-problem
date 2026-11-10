@@ -4,6 +4,7 @@ import StatsDisplay from "./StatsDisplay";
 import { useState } from "react";
 import { Vector3 } from "../types/types";
 import ShapeSpherePlotter from "./ShapeSpherePlotter";
+import { isFixedCentreOrbit } from "../utils/fixedCentres";
 
 interface CanvasProps {
   isTextPanelOpen: boolean;
@@ -13,6 +14,7 @@ function Canvas({ isTextPanelOpen }: CanvasProps) {
   const [simulationStats, setSimulationStats] = useState<{
     momentumChange: Vector3;
     energyChange: number;
+    gChange?: number;
     velocities: Vector3[];
   } | null>(null);
   const [selectedIntegrator, setSelectedIntegrator] =
@@ -32,10 +34,13 @@ function Canvas({ isTextPanelOpen }: CanvasProps) {
           integrator={selectedIntegrator}
           orbit={selectedOrbit}
         />
-        <ShapeSpherePlotter
-          integrator={selectedIntegrator}
-          orbit={selectedOrbit}
-        />
+        {/* The shape sphere describes three moving bodies, so it is not shown for the fixed centres */}
+        {!isFixedCentreOrbit(selectedOrbit) && (
+          <ShapeSpherePlotter
+            integrator={selectedIntegrator}
+            orbit={selectedOrbit}
+          />
+        )}
       </div>
       <div className="absolute bottom-0 left-0 flex h-32 w-full p-4 gap-4 justify-center items-center">
         <DropupMenus

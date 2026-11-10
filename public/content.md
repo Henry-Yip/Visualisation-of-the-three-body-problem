@@ -85,6 +85,28 @@ In the frame rotating with two orbiting bodies, there are $5$ points at which a 
 
 In the Figure-8 orbit, the most iconic of the periodic orbits, the three bodies follow the same curve, each a third of a period apart. Its existence was proved by Chenciner and Montgomery [3], although it has no known closed form.
 
+# Problem of Two Fixed Centres
+
+In the problem of two fixed centres, also called Euler's problem or the restricted Euler problem, two of the bodies are held in place at $(0, 1)$ and $(0, -1)$ and only the third moves. All three masses are $1$. Unlike the general three-body problem, it is integrable: besides the energy $h$ of the moving body, Euler found a second conserved quantity,
+
+$$g = \frac{1}{2}(y v_x - x v_y)^2 + \frac{1}{2}v_y^2 + y\left(\frac{1}{r_-} - \frac{1}{r_+}\right),$$
+
+where $r_+$ and $r_-$ are the distances to the centres at $y = 1$ and $y = -1$ [1, 4].
+
+Linear and angular momentum are not conserved here, because the fixed centres exert external forces on the moving body. For these orbits the panel at the bottom therefore shows the change in $g$ instead of the change in momentum.
+
+The values of $g$ and $h$ decide the type of orbit. Satellite orbits ($g < 0$) never cross the line $y = 0$, so they circle one centre only. Lemniscate orbits ($0 < g < 2 - |h|$) pass between the two centres, and planetary orbits ($g > 2 - |h|$) go round both. These boundaries hold for unit masses with the centres at distance $1$ from the origin.
+
+| Orbit      | Start $(x, y)$ | Velocity $(v_x, v_y)$ | $g$      | $h$      |
+| ---------- | -------------- | --------------------- | -------- | -------- |
+| Planetary  | $(1.8, 1.0)$   | $(2/3, -0.8)$         | $2.355$  | $-0.385$ |
+| Lemniscate | $(2.5, 1.5)$   | $(0, -0.4)$           | $0.416$  | $-0.595$ |
+| Satellite  | $(2.5, 2.0)$   | $(0, 0)$              | $-0.231$ | $-0.627$ |
+
+Table 4: The three orbits of the problem of two fixed centres used in [1].
+
+The planetary orbit is not a closed ellipse. Its prolate spheroidal coordinate $R$, the mean of the distances to the two centres, oscillates between $1.80$ and $3.39$, so over time the orbit fills a ring around both centres. These orbits are drawn at a third of the scale of the three-body orbits so that they fit on the screen, and played five times faster because they are slower.
+
 # Shape Sphere
 
 In a three-body problem, the bodies act on each other based on gravitational forces. Therefore, the effect of translation can be excluded.
@@ -124,6 +146,8 @@ The visualisation of the shape sphere can be seen at the bottom right corner.
 [2] Šuvakov and Dmitrašinović (2013), Three Classes of Newtonian Three-Body Planar Periodic Orbits, Physical Review Letters, 110, 114301.
 
 [3] Chenciner and Montgomery (2000), A Remarkable Periodic Solution of the Three-Body Problem in the Case of Equal Masses, Annals of Mathematics, 152, 881–901.
+
+[4] Dullin and Montgomery (2016), Syzygies in the Two Center Problem, Nonlinearity, 29(4).
 
 Henry Yip: Original python code and results, research project supervised by Prof. Jenni Smillie at the School of Physics and Astronomy, University of Edinburgh.
 

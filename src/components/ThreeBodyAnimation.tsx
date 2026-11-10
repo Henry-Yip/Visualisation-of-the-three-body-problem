@@ -8,6 +8,11 @@ import {
   ShaderMaterial,
 } from "three";
 import { OrbitControls } from "@react-three/drei";
+import {
+  FIXED_CENTRE_ORBITS,
+  FIXED_CENTRE_SCALE,
+  isFixedCentreOrbit,
+} from "../utils/fixedCentres";
 
 // Types
 interface Vector3 {
@@ -27,6 +32,8 @@ interface BodyConfig {
 interface FrameData {
   momentumChange: Vector3;
   energyChange: number;
+  // Change in Euler's second integral g, for the fixed-centre orbits only
+  gChange?: number;
   bodies: BodyConfig[];
 }
 
@@ -157,6 +164,7 @@ type OrbitProps = {
   onStatsUpdate?: (stats: {
     momentumChange: Vector3;
     energyChange: number;
+    gChange?: number;
     velocities: Vector3[];
   }) => void;
   integrator: string;
@@ -198,7 +206,8 @@ function Orbit({ onStatsUpdate, integrator, orbit }: OrbitProps) {
     "Yarn": "yar.txt",
     "Yin-Yang I": "yin-yang1.txt",
     "Yin-Yang II": "yin-yang2.txt",
-    "Yin-Yang III": "yin-yang3.txt"
+    "Yin-Yang III": "yin-yang3.txt",
+    ...FIXED_CENTRE_ORBITS,
   };
 
   useEffect(() => {
@@ -214,23 +223,29 @@ function Orbit({ onStatsUpdate, integrator, orbit }: OrbitProps) {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        console.log("File loaded successfully");
         return response.text();
       })
       .then((text) => {
-        console.log("File content:", text);
         const parsedFrames: FrameData[] = [];
         const lines = text.split(/\r?\n/).filter((line) => line.trim() !== "");
+        const scale = isFixedCentreOrbit(orbit) ? FIXED_CENTRE_SCALE : 1;
 
         let i = 0;
         while (i + 4 < lines.length) {
-          const dMomentumLine = lines[i++].trim();
-          const momentumTokens = dMomentumLine.split(/[ =]+/).filter(Boolean);
-          const momentumChange = {
-            x: parseFloat(momentumTokens[1]),
-            y: parseFloat(momentumTokens[2]),
-            z: parseFloat(momentumTokens[3]),
-          };
+          // The first line holds the change in momentum, or, for the fixed-centre
+          // orbits, where momentum is not conserved, the change in g.
+          const firstLine = lines[i++].trim();
+          const firstTokens = firstLine.split(/[ =]+/).filter(Boolean);
+          const gChange =
+            firstTokens[0] === "dG" ? parseFloat(firstTokens[1]) : undefined;
+          const momentumChange =
+            gChange === undefined
+              ? {
+                  x: parseFloat(firstTokens[1]),
+                  y: parseFloat(firstTokens[2]),
+                  z: parseFloat(firstTokens[3]),
+                }
+              : { x: 0, y: 0, z: 0 };
 
           const dEnergyLine = lines[i++].trim();
           const energyTokens = dEnergyLine.split(/[ =]+/).filter(Boolean);
@@ -246,9 +261,9 @@ function Orbit({ onStatsUpdate, integrator, orbit }: OrbitProps) {
             bodies.push({
               id,
               position: {
-                x: parseFloat(posX),
-                y: parseFloat(posY),
-                z: parseFloat(posZ),
+                x: parseFloat(posX) * scale,
+                y: parseFloat(posY) * scale,
+                z: parseFloat(posZ) * scale,
               },
               velocity: {
                 x: parseFloat(velX),
@@ -260,8 +275,7 @@ function Orbit({ onStatsUpdate, integrator, orbit }: OrbitProps) {
             });
           }
 
-          parsedFrames.push({ momentumChange, energyChange, bodies });
-          console.log("Parsed frames:", parsedFrames);
+          parsedFrames.push({ momentumChange, energyChange, gChange, bodies });
         }
 
         setFrames(parsedFrames);
@@ -293,6 +307,7 @@ function Orbit({ onStatsUpdate, integrator, orbit }: OrbitProps) {
         onStatsUpdate({
           momentumChange: currentFrame.momentumChange,
           energyChange: currentFrame.energyChange,
+          gChange: currentFrame.gChange,
           velocities: currentFrame.bodies.map((b) => b.velocity),
         });
       }

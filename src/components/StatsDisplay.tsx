@@ -1,6 +1,7 @@
 interface Stats {
   momentumChange: { x: number; y: number; z: number };
   energyChange: number;
+  gChange?: number;
   velocities: Array<{ x: number; y: number; z: number }>;
 }
 
@@ -41,8 +42,8 @@ const StatsDisplay = ({ stats }: StatsDisplayProps) => {
                   i === 0
                     ? "text-red-500"
                     : i === 1
-                    ? "text-green-500"
-                    : "text-blue-500"
+                    ? "text-blue-500"
+                    : "text-green-500"
                 }`}
               >
                 v<sub>{i + 1}</sub>:
@@ -55,8 +56,14 @@ const StatsDisplay = ({ stats }: StatsDisplayProps) => {
             </div>
           ))}
         </div>
-        {/* Left Column: Momentum & Energy */}
+        {/* Left Column: Momentum (or g, for the fixed centres) & Energy */}
         <div className="space-y-2">
+          {stats.gChange !== undefined ? (
+            <div className="text-lg flex items-baseline">
+              <span className="mr-2">Δg:</span>
+              {formatNumber(stats.gChange)}
+            </div>
+          ) : (
           <div className="text-lg flex items-baseline">
             <span className="mr-2">Δp:</span>
             <span className="whitespace-nowrap">
@@ -75,6 +82,7 @@ const StatsDisplay = ({ stats }: StatsDisplayProps) => {
               )
             </span>
           </div>
+          )}
           <div className="text-lg flex items-baseline">
             <span className="mr-2">ΔE:</span>
             {formatNumber(stats.energyChange)}
